@@ -1,23 +1,51 @@
 "use client";
-import React, { useState } from "react";
-import HeroSection from "./components/HeroSection";
-import FeaturesSection from "./components/FeaturesSection";
-import TestimonialsCarousel from "./components/TestimonialsCarousel";
-import FooterSection from "./components/FooterSection";
+import { useState } from "react";
+import { Navbar } from "./components/ui/navbar";
+import { HomePage } from "./components/HomePage";
+import ContactPage from "./contact/page";
+import { StudentDashboard } from "./components/StudentDashboard";
+import { TeacherDashboard } from "./components/TeacherDashboard";
+import TranslationProvider, { useTranslation } from "./TranslationProvider";
 
-import { useTranslation } from "./TranslationProvider";
+type Page = "home" | "contact" | "student-dashboard" | "teacher-dashboard";
 
-export default function Home() {
-  const { t } = useTranslation();
+function AppContent() {
+  const [currentPage, setCurrentPage] = useState<Page>("home");
+  const { t, lang, setLang } = useTranslation();
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case "home":
+        return <HomePage />;
+      case "contact":
+        return <ContactPage />;
+      case "student-dashboard":
+        return <StudentDashboard />;
+      case "teacher-dashboard":
+        return <TeacherDashboard />;
+      default:
+        return <HomePage />;
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex flex-col relative">
-      <HeroSection t={t} />
-      <FeaturesSection t={t} />
-      <TestimonialsCarousel
-        testimonials={t.testimonialsList}
-        title={t.testimonials}
+    <div className="min-h-screen bg-white">
+      <Navbar
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+        t={t.navbar}
+        lang={lang as "en" | "gu"}
+        setLang={setLang}
       />
-      <FooterSection t={t} />
-    </main>
+      <main>{renderPage()}</main>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <TranslationProvider>
+      <AppContent />
+    </TranslationProvider>
   );
 }

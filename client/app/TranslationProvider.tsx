@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, createContext, useContext } from "react";
-import Navbar from "./components/ui/navbar";
+import { useRouter } from "next/navigation";
+import { Navbar } from "./components/ui/navbar";
 
 const gu = {
   navbar: {
@@ -136,9 +137,37 @@ export default function TranslationProvider({
 }) {
   const [lang, setLang] = useState<"en" | "gu">("en");
   const t = lang === "gu" ? gu : en;
+  const router = useRouter();
+
+  function onNavigate(
+    page:
+      | "home"
+      | "contact"
+      | "student-dashboard"
+      | "teacher-dashboard"
+      | string
+  ) {
+    if (page === "home") router.push("/");
+    else if (page === "contact") router.push("/contact");
+    else if (page === "student-dashboard") router.push("/dashboard/student");
+    else if (page === "teacher-dashboard") router.push("/dashboard/teacher");
+    else if (
+      typeof page === "string" &&
+      (page.startsWith("guj-std-") || page.startsWith("eng-std-"))
+    ) {
+      router.push(`/standards/${page}`);
+    }
+  }
+
   return (
     <TranslationContext.Provider value={{ t, lang, setLang }}>
-      <Navbar t={t.navbar} lang={lang} />
+      <Navbar
+        t={t.navbar}
+        lang={lang}
+        currentPage={"home"}
+        onNavigate={onNavigate}
+        setLang={setLang}
+      />
       {children}
     </TranslationContext.Provider>
   );
